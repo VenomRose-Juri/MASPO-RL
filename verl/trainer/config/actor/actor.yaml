@@ -75,6 +75,33 @@ policy_loss:
   # KL divergence penalty coefficient
   ppo_kl_coef: 0.1
 
+  # Ratio clip config
+  ratio_clip:
+
+    # ratio_mode: maspo / ppo
+    ratio_mode: ppo
+
+    # hyperparameter sigma_base for maspo, recommend to set 1, 2, 3
+    maspo_sigma_base: 1
+
+    # hyperparameter alpha for maspo, recommend to set 0.3, 0.5
+    maspo_alpha: 0.3
+
+    # hyperparameter sigma_high for maspo
+    maspo_sigma_high: 10
+
+    # hyperparameter adv_low for maspo
+    maspo_adv_low: 0.1
+
+    # hyperparameter adv_high for maspo0
+    maspo_adv_high: 10
+
+    # hyperparameter beta_neg for maspo, recommend to set 0.03
+    maspo_beta_neg: 0.03
+
+    # hyperparameter beta_pos for maspo, recommend to set 0.03
+    maspo_beta_pos: 0.03
+
 # Constant C in Dual-clip PPO; clips when advantage < 0 and ratio > C
 clip_ratio_c: 3.0
 

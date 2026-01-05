@@ -838,6 +838,7 @@ def compute_policy_loss(
     cliprange_high=None,
     clip_ratio_c=3.0,
     loss_agg_mode: str = "token-mean",
+    policy_loss_config: dict = None,
 ):
     """
     Compute the clipped policy objective and related metrics for PPO.
@@ -872,32 +873,55 @@ def compute_policy_loss(
         + f" but get the value: {clip_ratio_c}."
     )
 
+    ratio_clip_config = policy_loss_config.ratio_clip
+    assert ratio_clip_config.ratio_mode in ["ppo", "maspo"], "Only PPO and MASPO are supported for now."
+
     negative_approx_kl = log_prob - old_log_prob
     # Clamp negative_approx_kl for stability
     negative_approx_kl = torch.clamp(negative_approx_kl, min=-20.0, max=20.0)
     ratio = torch.exp(negative_approx_kl)
     ppo_kl = verl_F.masked_mean(-negative_approx_kl, response_mask)
 
-    pg_losses1 = -advantages * ratio
     if cliprange_low is None:
         cliprange_low = cliprange
     if cliprange_high is None:
         cliprange_high = cliprange
-    pg_losses2 = -advantages * torch.clamp(
-        ratio, 1 - cliprange_low, 1 + cliprange_high
-    )  # - clip(ratio, 1-cliprange, 1+cliprange) * A
-    clip_pg_losses1 = torch.maximum(
-        pg_losses1, pg_losses2
-    )  # max(-ratio * A, -clip(ratio, 1-cliprange, 1+cliprange) * A)
-    pg_clipfrac = verl_F.masked_mean(torch.gt(pg_losses2, pg_losses1).float(), response_mask)
+    
+    lower_bound = 1 - cliprange_low
+    upper_bound = 1 + cliprange_high
+    log_upper_bound = torch.log(upper_bound) if isinstance(upper_bound, torch.Tensor) else torch.log(torch.tensor(upper_bound, device=log_prob.device, dtype=log_prob.dtype))
 
-    pg_losses3 = -advantages * clip_ratio_c
-    clip_pg_losses2 = torch.min(pg_losses3, clip_pg_losses1)
-    pg_clipfrac_lower = verl_F.masked_mean(
-        torch.gt(clip_pg_losses1, pg_losses3) * (advantages < 0).float(), response_mask
-    )
+    negative_lower_bound_case = (ratio < lower_bound) & (advantages < 0)
+    positive_upper_bound_case = (ratio > upper_bound) & (advantages > 0)
+    positive_case_maspo = (advantages > 0) & (ratio > 1)
+    negative_case_maspo = (advantages < 0) & (ratio < 1)
+    dual_clip_case = (ratio > clip_ratio_c) & (advantages < 0)
 
-    pg_losses = torch.where(advantages < 0, clip_pg_losses2, clip_pg_losses1)
+    pg_clipfrac = verl_F.masked_mean((negative_lower_bound_case | positive_upper_bound_case).float(), response_mask)
+    pg_clipfrac_lower = verl_F.masked_mean(dual_clip_case.float(), response_mask)
+
+    if ratio_clip_config.ratio_mode == "ppo":
+        ratio = torch.where(negative_lower_bound_case, lower_bound, ratio)
+        ratio = torch.where(positive_upper_bound_case, upper_bound, ratio)
+        ratio = torch.where(dual_clip_case, clip_ratio_c, ratio)
+    elif "maspo" in ratio_clip_config.ratio_mode:
+        maspo_sigma_base = ratio_clip_config.maspo_sigma_base  # σ_{base}=1.0
+        maspo_alpha = ratio_clip_config.maspo_alpha       # α=0.3
+        maspo_sigma_high = ratio_clip_config.maspo_sigma_high  # σ_{high}=10
+        maspo_adv_low = ratio_clip_config.maspo_adv_low    # a_{low}=0.1
+        maspo_adv_high = ratio_clip_config.maspo_adv_high   # a_{high}=10
+        maspo_beta_neg = ratio_clip_config.maspo_beta_neg    # β_{-}=0.03
+        maspo_beta_pos = ratio_clip_config.maspo_beta_pos    # β_{+}=0.03
+        old_prob = torch.exp(old_log_prob)
+        ratio_detached = ratio.detach()
+        sigma_neg = torch.clamp(maspo_sigma_base/old_prob**maspo_alpha, maspo_sigma_base, maspo_sigma_high) * torch.clamp(1/(1-maspo_beta_neg*advantages), maspo_adv_low, maspo_adv_high)
+        sigma_pos = torch.clamp(maspo_sigma_base/old_prob**maspo_alpha, maspo_sigma_base, maspo_sigma_high) * torch.clamp(1+maspo_beta_pos*advantages, maspo_adv_low, maspo_adv_high)
+        weight_neg = torch.exp(-(ratio_detached - 1)**2 / 2 / sigma_neg**2)
+        weight_pos = torch.exp(-(ratio_detached - 1)**2 / 2 / sigma_pos**2)
+        ratio = torch.where(negative_case_maspo, weight_neg * ratio, ratio)
+        ratio = torch.where(positive_case_maspo, weight_pos * ratio, ratio)
+
+    pg_losses = -advantages * ratio
     pg_loss = agg_loss(loss_mat=pg_losses, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
 
     return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower
