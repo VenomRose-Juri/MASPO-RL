@@ -18,6 +18,13 @@ Current Reinforcement Learning with Verifiable Rewards (RLVR) paradigms, such as
 
 - **Superior Performance**: Comprehensive evaluations on diverse mathematical benchmarks consistently demonstrate that MASPO achieves superior sample efficiency and reasoning performance. Further experiments confirm its robustness across varying LLM scales and effectiveness in stabilizing long-chain reasoning.
 
+## 🎨 Overview
+
+<div align="center">
+  <img src="docs/images/maspo_intro.svg" alt="MASPO Overview" width="80%">
+  <p><em>Figure 1: Three core limitations of GRPO</em></p>
+</div>
+
 ## 🚀 Quick Start
 
 ### Installation
@@ -161,23 +168,34 @@ The MASPO framework integrates three key components:
 
 MASPO replaces hard clipping with a differentiable soft Gaussian gating mechanism:
 
-$$\mathcal{F}^\text{MASPO}_{i,t} = \begin{cases}
-\exp \left( {-\frac{(\rho_{i,t}(\theta)-1)^{2}}{2 \sigma^{2}_\text{pos}}} \right) & \text{if } \hat{A}_{i,t}>0 \land \rho_{i,t}(\theta)>1 \\
-\exp \left( {-\frac{(\rho_{i,t}(\theta)-1)^{2}}{2 \sigma^{2}_\text{neg}}} \right) & \text{if } \hat{A}_{i,t}<0 \land \rho_{i,t}(\theta)<1 \\
+$$
+\mathcal{F}^{\mathrm{MASPO}}_{i,t} = \begin{cases}
+\exp \left( -\frac{(\rho_{i,t}(\theta)-1)^{2}}{2 \sigma^{2}_{\mathrm{pos}}} \right) & \text{if } \hat{A}_{i,t}>0 \land \rho_{i,t}(\theta)>1 \\
+\exp \left( -\frac{(\rho_{i,t}(\theta)-1)^{2}}{2 \sigma^{2}_{\mathrm{neg}}} \right) & \text{if } \hat{A}_{i,t}<0 \land \rho_{i,t}(\theta)<1 \\
 1, & \text{otherwise}
-\end{cases}$$
+\end{cases}
+$$
 
 #### Dual-Variable Adaptive Variance
 
 The variance $\sigma$ is dynamically determined by combining mass-adaptive scaling and asymmetric risk control:
 
-$$\sigma_\text{pos} = \underbrace{\frac{\sigma_\text{base}}{\pi_{\theta_{old}}^{\alpha}}}_{\text{Mass-Adaptive}} \cdot \underbrace{\left( 1+\beta_\text{high} \hat{A}_{i,t} \right)}_{\text{Risk Controller}}$$
+$$
+\sigma_{\mathrm{pos}} = \underbrace{\frac{\sigma_{\mathrm{base}}}{\pi_{\theta_{\mathrm{old}}}^{\alpha}}}_{\mathrm{Mass-Adaptive}} \cdot \underbrace{\left( 1+\beta_{\mathrm{high}} \hat{A}_{i,t} \right)}_{\mathrm{Risk\ Controller}}
+$$
 
-$$\sigma_\text{neg} = \underbrace{\frac{\sigma_\text{base}}{\pi_{\theta_{old}}^{\alpha}}}_{\text{Mass-Adaptive}} \cdot \underbrace{\left(1-\beta_\text{low} \hat{A}_{i,t} \right)^{-1}}_{\text{Risk Controller}}$$
+$$
+\sigma_{\mathrm{neg}} = \underbrace{\frac{\sigma_{\mathrm{base}}}{\pi_{\theta_{\mathrm{old}}}^{\alpha}}}_{\mathrm{Mass-Adaptive}} \cdot \underbrace{\left(1-\beta_{\mathrm{low}} \hat{A}_{i,t} \right)^{-1}}_{\mathrm{Risk\ Controller}}
+$$
 
 Where:
-- **Mass-Adaptive Limiter**: The term $\frac{\sigma_\text{base}}{\pi_{\theta_{old}}^{\alpha}}$ inversely scales the trust region width with token probability, expanding exploration budget for low-probability tokens while enforcing strict constraints for high-probability tokens.
+- **Mass-Adaptive Limiter**: The term $\frac{\sigma_{\mathrm{base}}}{\pi_{\theta_{\mathrm{old}}}^{\alpha}}$ inversely scales the trust region width with token probability, expanding exploration budget for low-probability tokens while enforcing strict constraints for high-probability tokens.
 - **Asymmetric Risk Controller**: The second component modulates the trust region based on signal confidence, expanding for high-confidence positive signals and constraining for ambiguous negative signals.
+
+<div align="center">
+  <img src="docs/images/maspo_method.svg" alt="MASPO Method" width="80%">
+  <p><em>Figure 2: MASPO method illustration</em></p>
+</div>
 
 ### Key Advantages
 
