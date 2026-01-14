@@ -21,7 +21,7 @@ Current Reinforcement Learning with Verifiable Rewards (RLVR) paradigms, such as
 ## 🎨 Overview
 
 <div align="center">
-  <img src="docs/images/maspo_intro.svg" alt="MASPO Overview" width="80%">
+  <img src="docs/images/maspo_intro.svg" alt="MASPO Overview" width="100%">
   <p><em>Figure 1: Three core limitations of GRPO</em></p>
 </div>
 
@@ -193,7 +193,7 @@ Where:
 - **Asymmetric Risk Controller**: The second component modulates the trust region based on signal confidence, expanding for high-confidence positive signals and constraining for ambiguous negative signals.
 
 <div align="center">
-  <img src="docs/images/maspo_method.svg" alt="MASPO Method" width="80%">
+  <img src="docs/images/maspo_method.svg" alt="MASPO Method" width="100%">
   <p><em>Figure 2: MASPO method illustration</em></p>
 </div>
 
