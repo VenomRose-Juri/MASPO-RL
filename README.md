@@ -2,7 +2,19 @@
 
 # MASPO: Unifying Gradient Utility, Probability Mass, and Signal Asymmetry for Robust and Sample-Efficient LLM Reasoning
 
-**Mass-Adaptive Soft Policy Optimization (MASPO)** - Official Implementation
+<p align="center">
+  <strong>Mass-Adaptive Soft Policy Optimization (MASPO)</strong> · Official Implementation
+</p>
+<p align="center">
+  <a href="https://arxiv.org/abs/2602.17550">
+    <img src="https://img.shields.io/badge/Paper-arXiv-red.svg" alt="Paper" />
+  </a>
+  <a href="https://github.com/verl-project/verl">
+    <img src="https://img.shields.io/badge/Framework-verl-blueviolet.svg" alt="Framework: verl" />
+  </a>
+  <img src="https://img.shields.io/badge/Domain-LLM%20Reasoning-orange.svg" alt="Domain: LLM Reasoning" />
+  <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen.svg" alt="PRs Welcome" />
+</p>
 
 </div>
 
@@ -250,10 +262,6 @@ This work builds upon and improves several existing methods:
 
 For more details on the theoretical analysis and comparison, please refer to our paper.
 
-## 🙏 Acknowledgments
-
-This implementation is built on top of [verl](https://github.com/volcengine/verl), a flexible and efficient RLHF framework. We thank the verl community for their excellent infrastructure.
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -287,10 +295,33 @@ This implementation is built on top of [verl](https://github.com/volcengine/verl
   - Higher values: More aggressive signal-aware updates
   - Lower values: More conservative, closer to uniform handling
 
+## 📚 Citation
+
+If you find MASPO helpful in your research or applications, please consider citing our paper:
+
+```bibtex
+@article{maspo,
+  title={MASPO: Unifying Gradient Utilization, Probability Mass, and Signal Reliability for Robust and Sample-Efficient LLM Reasoning},
+  author={Fu, Xiaoliang and Lin, Jiaye and Fang, Yangyi and Zheng, Binbin and Hu, Chaowen and Shao, Zekai and Qin, Cong and Pan, Lu and Zeng, Ke and Cai, Xunliang},
+  journal={arXiv preprint arXiv:2602.17550},
+  year={2026}
+}
+```
+
+## 🙏 Acknowledgments
+
+This implementation is built on top of [verl](https://github.com/volcengine/verl), a flexible and efficient RLHF framework. We thank the verl community for their excellent infrastructure.
+
 ## 📝 License
 
 This project follows the same license as verl. Please refer to the verl repository for license details.
 
 ---
 
-**Note**: This is the official implementation of MASPO. For more details, please refer to our paper.
+<div align="center">
+
+**⭐ If MASPO helps your research or applications, please give us a star! ⭐**
+
+**Note**: This is the official implementation of MASPO. For more details, please refer to our paper ❤️.
+
+</div>
