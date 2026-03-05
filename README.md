@@ -116,7 +116,7 @@ For a complete training example, see `examples/maspo_trainer/run_deepseek-r1-dis
 
 ### Main Results
 
-We evaluate MASPO on multiple mathematical reasoning benchmarks including AIME24, AIME25, AMC23, MATH500, Minerva, and OlympiadBench. The following table shows the comprehensive comparison with competitive baselines:
+We evaluate MASPO on multiple mathematical reasoning benchmarks including AIME24, AIME25, AMC23, MATH500, Minerva, and OlympiadBench. For evaluation datasets, refer to 🤗 [xuekai/flowrl-data-collection](https://huggingface.co/datasets/xuekai/flowrl-data-collection). The following table shows the comprehensive comparison with competitive baselines:
 
 #### DeepSeek-R1-Distill-Qwen-1.5B Results
 
