@@ -3,7 +3,8 @@
 # MASPO: Unifying Gradient Utility, Probability Mass, and Signal Asymmetry for Robust and Sample-Efficient LLM Reasoning
 
 <p align="center">
-  <strong>Mass-Adaptive Soft Policy Optimization (MASPO)</strong> · Official Implementation
+  <strong>Mass-Adaptive Soft Policy Optimization (MASPO)</strong><br/>
+  Official Implementation
 </p>
 <p align="center">
   <a href="https://arxiv.org/abs/2602.17550">
@@ -17,6 +18,24 @@
 </p>
 
 </div>
+
+## Overview
+
+**MASPO (Mass-Adaptive Soft Policy Optimization)** is a unified RLVR framework for improving the robustness and sample efficiency of LLM reasoning.
+
+Existing RLVR methods such as **GRPO** rely on rigid, uniform, and symmetric trust-region mechanisms, which are often misaligned with the optimization dynamics of large language models. MASPO addresses three key limitations:
+
+1. **Inefficient gradient utilization** caused by hard clipping
+2. **Probability mass insensitivity** under uniform ratio constraints
+3. **Asymmetric signal reliability** between positive and negative samples
+
+To address these issues, MASPO combines:
+
+- a **soft Gaussian gating** mechanism,
+- a **mass-adaptive limiter**, and
+- an **asymmetric risk controller**.
+
+Extensive experiments show that MASPO consistently improves both reasoning accuracy and sample efficiency across multiple model scales.
 
 ## 📖 Abstract
 
@@ -41,11 +60,13 @@ Current Reinforcement Learning with Verifiable Rewards (RLVR) paradigms, such as
 
 ### Installation
 
-This implementation is based on [verl](https://github.com/volcengine/verl), a flexible and efficient RLHF framework. Please follow the verl installation guide first.
+This implementation is built on top of [verl](https://github.com/volcengine/verl), a flexible and efficient RLHF / RLVR framework.
+
+Please install `verl` first by following its official setup instructions, and then install the dependencies for this repository:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/MASPO-RL.git
+git clone https://github.com/VenomRose-Juri/MASPO-RL
 cd MASPO-RL
 
 # Install verl dependencies (see verl documentation for details)
@@ -60,9 +81,9 @@ We provide a complete example script for training with MASPO on GSM8K dataset:
 bash examples/maspo_trainer/run_deepseek-r1-distill-qwen-7b.sh
 ```
 
-### Key Configuration Parameters
+### Enable MASPO in Config
 
-To enable MASPO, set the following parameters in your configuration:
+To use MASPO, set the following configuration fields:
 
 ```yaml
 actor_rollout_ref.actor.policy_loss.ratio_clip.ratio_mode: maspo
@@ -144,7 +165,7 @@ We evaluate MASPO on multiple mathematical reasoning benchmarks including AIME24
 | SAPO | 47.5 / 79.2 | 35.3 / 58.0 | 88.7 / 95.0 | 85.5 / 92.9 | **39.4** / 58.1 | 56.6 / 74.6 | 58.8 / 76.3 |
 | **MASPO (Ours)** | **53.2** / 82.4 | **42.9** / **73.2** | **91.4** / 95.0 | **86.0** / 94.7 | 39.3 / 58.6 | **58.0** / 74.9 | **61.8** / **79.8** |
 
-**Key Findings:**
+### Main Takeaways
 - **1.5B Model**: MASPO outperforms GRPO by **+3.0%** (48.4 → 51.4) and best baseline (SAPO) by **+0.2%** (51.2 → 51.4) in Avg@32
 - **7B Model**: MASPO outperforms GRPO by **+2.9%** (58.9 → 61.8) and best baseline (Clip Higher) by **+2.6%** (59.2 → 61.8) in Avg@32
 - MASPO demonstrates superior performance across the majority of benchmarks on both scales
@@ -238,7 +259,7 @@ maspo/
 
 ### Code Location
 
-- **Core Algorithm**: `verl/trainer/ppo/core_algos.py` (lines 907-922)
+- **Core Algorithm**: `verl/trainer/ppo/core_algos.py`
 - **Actor Integration**: `verl/workers/actor/dp_actor.py` (uses `compute_policy_loss` with MASPO mode)
 - **Configuration**: `verl/trainer/config/actor/actor.yaml` (ratio_clip section)
 
