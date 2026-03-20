@@ -259,7 +259,7 @@ maspo/
 
 ### Code Location
 
-- **Core Algorithm**: `verl/trainer/ppo/core_algos.py`
+- **Core Algorithm**: `verl/trainer/ppo/core_algos.py` (lines 907-922)
 - **Actor Integration**: `verl/workers/actor/dp_actor.py` (uses `compute_policy_loss` with MASPO mode)
 - **Configuration**: `verl/trainer/config/actor/actor.yaml` (ratio_clip section)
 
