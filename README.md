@@ -66,7 +66,7 @@ Please install `verl` first by following its official setup instructions, and th
 
 ```bash
 # Clone the repository
-git clone https://github.com/VenomRose-Juri/MASPO-RL
+git clone https://github.com/FlyTune/MASPO-RL
 cd MASPO-RL
 
 # Install verl dependencies (see verl documentation for details)
